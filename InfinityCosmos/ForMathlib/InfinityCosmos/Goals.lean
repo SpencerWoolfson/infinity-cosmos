@@ -97,7 +97,49 @@ theorem of_toComposableArrows :
 
 end ULiftFin
 
-def simplexIsNerve (n : ℕ) : Δ[n] ≅ nerve (ULiftFin (n + 1)) := sorry
+def simplexToNerve (n : ℕ) (X : SimplexCategoryᵒᵖ) :
+    Δ[n].obj X ⟶ (nerve (ULiftFin (n + 1))).obj X :=
+  λ S => S.down.toOrderHom.monotone'.functor ⋙ (ULiftFin.toComposableArrows (𝟭 (ULiftFin (n + 1))))
+
+theorem simplexToNerveNat (n : ℕ) (X Y : SimplexCategoryᵒᵖ) (f : X ⟶ Y) :
+    Δ[n].map f ≫ simplexToNerve n Y = simplexToNerve n X ≫ (nerve (ULiftFin (n + 1))).map f := by
+  ext a
+  unfold simplexToNerve
+  refine Functor.ext (fun _ => ?_) (fun _ _ _=> rfl)
+  apply ULift.ext
+  congr
+
+def nerveToSimplex (n : ℕ) (X : SimplexCategoryᵒᵖ) :
+    (nerve (ULiftFin (n + 1))).obj X ⟶ Δ[n].obj X := by
+  rcases X with ⟨X⟩
+  unfold nerve
+  intro F
+  fconstructor
+  simp[Quiver.Hom]
+  unfold SimplexCategory.Hom
+  refine OrderHom.mk (λ x => (ULiftHom.objDown (F.obj x)).down) (Fin.monotone_iff_le_succ.mpr ?_)
+  intro i
+  have le2 : (F.obj i.castSucc) ⟶ (F.obj i.succ) := by
+    refine F.map ?_
+    fconstructor
+    exact {down := Fin.castSucc_le_succ i}
+  exact le2.down.down.down
+
+def simplexIsNerve (n : ℕ) : Δ[n] ≅ nerve (ULiftFin (n + 1)) where
+  hom := NatTrans.mk (simplexToNerve n) (simplexToNerveNat n)
+  inv := by
+    refine NatTrans.mk (nerveToSimplex n) (fun _ _ _ => ?_)
+    . ext
+      congr
+  hom_inv_id := by
+    ext
+    unfold nerveToSimplex
+    unfold simplexToNerve
+    apply ULift.ext
+    dsimp
+    ext
+    exact rfl
+
 
 noncomputable def iso : hoFunctor.obj Δ[0] ≅ Cat.of (ULiftFin 1) :=
   hoFunctor.mapIso (simplexIsNerve 0) ≪≫ nerveFunctorCompHoFunctorIso.app (Cat.of (ULiftFin 1))
