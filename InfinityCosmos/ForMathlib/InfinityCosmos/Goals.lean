@@ -140,7 +140,6 @@ def simplexIsNerve (n : ℕ) : Δ[n] ≅ nerve (ULiftFin (n + 1)) where
     ext
     exact rfl
 
-
 noncomputable def iso : hoFunctor.obj Δ[0] ≅ Cat.of (ULiftFin 1) :=
   hoFunctor.mapIso (simplexIsNerve 0) ≪≫ nerveFunctorCompHoFunctorIso.app (Cat.of (ULiftFin 1))
 
