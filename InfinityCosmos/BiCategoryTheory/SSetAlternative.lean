@@ -68,11 +68,13 @@ noncomputable instance SSet.CatEnrichedCat : EnrichedCategory Cat SSet :=
   instEnrichedCategoryTransportEnrichment (C := SSet) SSet.hoFunctor
 
 noncomputable instance SSet.Bicategory : Bicategory SSet := inferInstance
+noncomputable instance SSet.Category : Category SSet := StrictBicategory.category SSet
 
 def BiQCat : Type (u+1) := SubBiCat SSet SSet.Quasicategory
 
 noncomputable instance : Bicategory BiQCat := SubBiCat.BiCat SSet SSet.Quasicategory
 noncomputable instance : Bicategory.Strict BiQCat := SubBiCat.BiCatStrict SSet SSet.Quasicategory
+noncomputable instance : Category BiQCat := StrictBicategory.category BiQCat
 
 -- section
 -- /- This is Code stolen from the Goals File. I do not want to import it because it contains some

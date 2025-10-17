@@ -32,12 +32,10 @@ structure Inner {A B : SSet.{u}} (f : SSet.Bicategory.Hom A  B) : Prop where
     ∃ σ : SSet.Bicategory.Hom Δ[n+2] A, (σ₀ = (HornInc.{u} n i) ≫ σ) ∧ (σ₁ = σ ≫ f)
 
 
-theorem Inner.pullback {a b c : SSet} (f : SSet.Bicategory.Hom a b) (g : SSet.Bicategory.Hom c b) (h : Inner f) (pb : Bicategory.pullback.of f g): Inner (pb.snd) where
+theorem Inner.pullback {a b c : SSet.{u}} (f : a ⟶ b) (g : c ⟶ b) (h : Inner f) (pb : @Limits.PullbackCone _ SSet.Category _ _ _ f g) (pbh : Limits.IsLimit pb): Inner (pb.snd) where
   hornFilling'' {n i} σ₀ h0 hn σ₁ hc := by
-    have h'' : (σ₀ ≫ pb.fst) ≫ f = (HornInc.{u_1,u_1} n i) ≫ σ₁ ≫ g := by
-      rw [Bicategory.Strict.assoc]
-      unfold Bicategory.pullback.fst
-      unfold pb.cone.π.app
+    have h'' : (σ₀ ≫ Limits.pullback.fst f g) ≫ f = Λ[n + 2, i].ι ≫ σ₁ ≫ g := by
+      rw [Category.assoc,Limits.pullback.condition,<-Category.assoc,hc,Category.assoc]
     let h' := h.hornFilling'' (σ₀ ≫ (Limits.pullback.fst f g)) h0 hn (σ₁ ≫ g) h''
     rcases h' with ⟨e,cond⟩
     fconstructor
@@ -47,6 +45,22 @@ theorem Inner.pullback {a b c : SSet} (f : SSet.Bicategory.Hom a b) (g : SSet.Bi
         . simp[cond.1]
         . simp [hc]
       . simp
+
+-- theorem Inner.pullback {a b c : SSet} (f : SSet.Bicategory.Hom a b) (g : SSet.Bicategory.Hom c b) (h : Inner f) (pb : pullback.of f g): Inner (pb.snd) where
+--   hornFilling'' {n i} σ₀ h0 hn σ₁ hc := by
+--     have h'' : (σ₀ ≫ pb.fst) ≫ f = (HornInc.{u_1,u_1} n i) ≫ σ₁ ≫ g := by
+--       rw [Bicategory.Strict.assoc]
+--       unfold Bicategory.pullback.fst
+--       unfold pb.cone.π.app
+--     let h' := h.hornFilling'' (σ₀ ≫ (Limits.pullback.fst f g)) h0 hn (σ₁ ≫ g) h''
+--     rcases h' with ⟨e,cond⟩
+--     fconstructor
+--     . exact Limits.pullback.lift e σ₁ cond.2.symm
+--     . refine ⟨?_,?_⟩
+--       . apply Limits.pullback.hom_ext
+--         . simp[cond.1]
+--         . simp [hc]
+--       . simp
 
 
 

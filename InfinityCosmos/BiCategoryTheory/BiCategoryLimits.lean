@@ -62,54 +62,48 @@ def Bicategory.pullback.Diagrammk {C : Type v} [Bicategory C] [Bicategory.Strict
 /--/ { app := fun j => Option.casesOn j (fst ≫ f) fun j' => WalkingPair.casesOn j' fst snd
          naturality := by rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) j <;> cases j <;> simp [eq] } -/
 
-def Bicategory.pullback.Conemk {C : Type v} [Bicategory C] [Bicategory.Strict C] {a b c d: C}
-  (g : a ⟶ b) (r : c ⟶ b) (t : d ⟶ c) (l : d ⟶ a) (h : l ≫ g ≅ t ≫ r ) : Bicategory.Cone (Bicategory.pullback.Diagrammk g r) where
-    pt := d
-    π := by
-      fconstructor
-      . intro cs
-        rcases cs with ⟨cs⟩
-        refine Option.casesOn cs ?_ ?_
-        . exact (l ≫ g)
-        . intro cs
-          refine Limits.WalkingPair.casesOn cs ?_ ?_
-          . exact l
-          . exact t
-      . rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) ⟨j⟩ <;> cases j <;> simp[Diagrammk,LaxFunctor.Const] <;> try {exact 𝟙 _}
-        . exact h.hom
-      . rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) ⟨m1⟩ ⟨m2⟩ ⟨⟨η⟩⟩ <;> cases m1 <;> cases η
-        . sorry
-        . simp
+theorem Disc {a b : BiWalkingCospan} {f : a ⟶ b} (η : f ⟶ f) : η = 𝟙 f := by
+  exact rfl
 
+theorem Disc2 {a b : BiWalkingCospan} (f g : a ⟶ b) : f = g := by
+  rcases a with ⟨a⟩ 
+  rcases b with ⟨b⟩
+  rcases f with ⟨f⟩ 
+  rcases g with ⟨g⟩
+  cases a <;> cases b <;> cases f <;> cases g
+  . simp
+  . simp 
+  . simp
 
+theorem Disc3 {a b : BiWalkingCospan} {f g : a ⟶ b} (η : f ⟶ g) : η = eqToHom (Disc2 f g)  := by
+  rcases a with ⟨a⟩ 
+  rcases b with ⟨b⟩
+  rcases f with ⟨f⟩ 
+  rcases g with ⟨g⟩
+  rcases η with ⟨⟨η⟩⟩
+  cases a <;> cases b <;> cases f <;> cases g 
+  . exact rfl
+  . exact rfl
+  . exact rfl
 
+#check Bicategory.Strict.leftUnitor_eqToIso
 
+theorem hl (x : LocallyDiscrete Limits.WalkingCospan) : @CategoryStruct.id BiWalkingCospan (locallyDiscreteBicategory Limits.WalkingCospan).toCategoryStruct x = @Discrete.mk (x.as ⟶ x.as) (𝟙 x.as) := by
+  exact rfl
 
-
-
-
-
-
-      --   intro cs
-      --   simp [Diagrammk,LaxFunctor.Const]
-      --   cases cs.as
-      --   . exact (l ≫ g)
-      --   . rename_i val
-      --     cases val
-      --     . exact l
-      --     . exact t
-      -- . intro cs1 cs2 f
-      --   simp[Diagrammk,LaxFunctor.Const]
-      --   cases cs1
-      --   rename_i cs1
-      --   cases cs2
-      --   rename_i cs2
-      --   cases cs1 <;> try rename_i cs1 <;> try cases cs1 <;> cases cs2 <;> try rename_i cs2 <;> try cases cs2 <;> simp[Limits.cospan]
-      --   .
-
-
-
-
+-- def Bicategory.pullback.Conemk {C : Type v} [Bicategory C] [Bicategory.Strict C] {a b c d: C}
+--   (g : a ⟶ b) (r : c ⟶ b) (t : d ⟶ c) (l : d ⟶ a) (h1 : l ≫ g ≅ t ≫ r ) (h2 : ∀(iso : l ≫ g ≅ t ≫ r), iso = h1) : Bicategory.Cone (Bicategory.pullback.Diagrammk g r) where
+--     pt := d
+--     π := by
+--       fconstructor
+--       . rintro ⟨cs⟩
+--         exact Option.casesOn cs (l ≫ g) (fun cs => Limits.WalkingPair.casesOn cs l t)
+--       . rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) ⟨j⟩ <;> cases j <;> simp[Diagrammk,LaxFunctor.Const] <;> try {exact 𝟙 _}
+--         . exact h1.hom
+--       . rintro (⟨⟩ | ⟨⟨⟩⟩) (⟨⟩ | ⟨⟨⟩⟩) ⟨m1⟩ ⟨m2⟩ ⟨⟨η⟩⟩ <;> cases m1 <;> cases η <;> simp[Diagrammk,LaxFunctor.Const,Disc]
+--       . rintro (⟨⟩ | ⟨⟨⟩⟩)
+--         . simp [hl,Diagrammk,LaxFunctor.Const,Bicategory.Strict.leftUnitor_eqToIso,Bicategory.Strict.rightUnitor_eqToIso]
+--       . sorry
 
 abbrev Bicategory.pullback.of {C : Type v} [Bicategory C] [Bicategory.Strict C] {a b c : C} (f : a ⟶ b) (g : c ⟶ b) :=
   Bicategory.pullback (Bicategory.pullback.Diagrammk f g)
