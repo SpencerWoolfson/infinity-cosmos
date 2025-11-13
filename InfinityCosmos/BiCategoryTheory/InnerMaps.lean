@@ -16,7 +16,9 @@ open Simplicial
 
 open SimplicialCategory
 
-def HornInc (n : Nat) (i : Fin (n+3)): SSet.Bicategory.Hom Λ[n + 2, i].toSSet Δ[n + 2] := by
+def SimpSetFull (n : Nat) : SSet := Δ[n + 2]
+
+def HornInc (n : Nat) (i : Fin (n+3)): SSet.Category.Hom Λ[n + 2, i].toSSet Δ[n + 2].toSSet := by
   fconstructor
   fconstructor
   fconstructor
